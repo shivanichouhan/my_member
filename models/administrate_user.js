@@ -1,52 +1,28 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const uuidv1 = require('uuid/v1');
-
+uuidv1()
 const userSchema = new mongoose.Schema(
     {
-        firstname: {
+        fullName: {
             type: String,
             trim: true,
             required: true,
             maxlength: 32
         },
-        lastname: {
+        userName: {
             type: String,
             trim: true,
             required: true,
             maxlength: 32
         },
-        bussinessname: {
-            type: String,
-            trim: true,
-            required: true,
-            maxlength: 32
-        },
-        bussinessAddress: {
-            type: String,
-            trim: true,
-            required: true,
-            maxlength: 32
-        },
+
         phone: {
             type: String,
             trim: true,
             required: true,
             maxlength: 32
         },
-        industry:{
-            type: String,
-            trim: true,
-            required: true,
-            maxlength: 32
-        },
-        username:{
-            type: String,
-            trim: true,
-            required: true,
-            maxlength: 32
-        },
-
         email: {
             type: String,
             trim: true,
@@ -57,41 +33,51 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        about: {
+        status: {
             type: String,
-            trim: true
+            trim: true,
+            required: true
         },
         salt: String,
-        role: {
-            type: Number,
-            default: 0
+        profile_type: {
+            type: String,
+            required: true
         },
-        history: {
-            type: Array,
-            default: []
+        profile_image: {
+            type: String
+        }, reset_code: {
+            type: String,
+            default: ''
+        },resetPasswordToken:{
+            type:String,
+            default:''
+        },resetPasswordExpires:{
+            type:String,
+            default:''
         }
     },
     { timestamps: true }
 );
 
 // virtual field
+
 userSchema
     .virtual('password')
-    .set(function(password) {
+    .set(function (password) {
         this._password = password;
         this.salt = uuidv1();
         this.hashed_password = this.encryptPassword(password);
     })
-    .get(function() {
+    .get(function () {
         return this._password;
     });
 
 userSchema.methods = {
-    authenticate: function(plainText) {
+    authenticate: function (plainText) {
+        console.log(this.encryptPassword(plainText))
         return this.encryptPassword(plainText) === this.hashed_password;
     },
-
-    encryptPassword: function(password) {
+    encryptPassword: function (password) {
         if (!password) return '';
         try {
             return crypto
@@ -104,4 +90,4 @@ userSchema.methods = {
     }
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('administrator_users', userSchema);
